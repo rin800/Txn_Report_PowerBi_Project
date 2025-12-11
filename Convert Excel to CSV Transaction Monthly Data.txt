@@ -1,0 +1,44 @@
+
+PS C:\Users\Admin\OneDrive\Desktop\Sepmon> # Start Excel (invisible)
+>> $excel = New-Object -ComObject Excel.Application
+>> $excel.Visible = $false
+>> $excel.DisplayAlerts = $false
+>>
+>> # Define folders
+>> $folderPath = "C:\Users\Admin\OneDrive\Desktop\Sepmon"
+>> $outputFolder = "C:\Users\Admin\OneDrive\Desktop\ConsollSep"
+>>
+>> # Create output folder if it doesn’t exist
+>> if (!(Test-Path -Path $outputFolder)) {
+>>     New-Item -ItemType Directory -Path $outputFolder | Out-Null
+>> }
+>>
+>> # Loop through each Excel file in the folder
+>> Get-ChildItem -Path $folderPath -Filter *.xlsx | ForEach-Object {
+>>     Write-Host "Processing file:" $_.FullName
+>>     $workbook = $excel.Workbooks.Open($_.FullName)
+>>
+>>     foreach ($sheet in $workbook.Worksheets) {
+>>         $csvPath = Join-Path $outputFolder ($_.BaseName + "_" + $sheet.Name + ".csv")
+>>         Write-Host "Saving:" $csvPath
+>>         $sheet.SaveAs($csvPath, 6)  # 6 = CSV format
+>>     }
+>>
+>>     $workbook.Close($false)
+>> }
+>>
+>> # Quit Excel
+>> $excel.Quit()
+>> [System.Runtime.Interopservices.Marshal]::ReleaseComObject($excel) | Out-Null
+>>
+>> Write-Host "✅ All Excel sheets converted to CSV in $outputFolder"
+>>
+>>
+Processing file: C:\Users\Admin\OneDrive\Desktop\Sepmon\Transaction_Report Sep'25.xlsx
+Saving: C:\Users\Admin\OneDrive\Desktop\ConsollSep\Transaction_Report Sep'25_Spend.csv
+Saving: C:\Users\Admin\OneDrive\Desktop\ConsollSep\Transaction_Report Sep'25_Load.csv
+Saving: C:\Users\Admin\OneDrive\Desktop\ConsollSep\Transaction_Report Sep'25_ACECRED.csv
+Saving: C:\Users\Admin\OneDrive\Desktop\ConsollSep\Transaction_Report Sep'25_OFFLINE.csv
+✅ All Excel sheets converted to CSV in C:\Users\Admin\OneDrive\Desktop\ConsollSep
+PS C:\Users\Admin\OneDrive\Desktop\Sepmon> ^C
+PS C:\Users\Admin\OneDrive\Desktop\Sepmon>

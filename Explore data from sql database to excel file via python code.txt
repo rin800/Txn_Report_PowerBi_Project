@@ -1,0 +1,21 @@
+import pandas as pd
+import pymysql as sql # or your database connector
+from sqlalchemy import create_engine  # optional, for SQLAlchemy connections
+
+# Connect to database
+connect = sql.connect(host='localhost',port=3306,user = 'root', password = '')
+
+
+cursor = connect.cursor()
+cursor.execute('USE txn_2023')
+
+# Read data into DataFrame
+query = "SELECT * FROM txn_april23 LIMIT 100"
+df = pd.read_sql(query, connect)
+
+# Export to Excel
+df.to_excel(r"C:\Users\Admin\Desktop\apr_2344.xlsx", index=False)
+
+print("Successfully Exported")
+
+connect.close()
